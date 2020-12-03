@@ -54,17 +54,15 @@ namespace Pluto.PortableExecutable.DataDirectories
 
                     var ordinalTable = MemoryMarshal.Cast<byte, short>(ImageBytes.Span.Slice(ordinalTableOffset, sizeof(short) * exportDirectory.NumberOfNames));
 
-                    var functionOrdinal = ordinalTable[middle];
-
                     // Read the address table
 
                     var addressTableOffset = RvaToOffset(exportDirectory.AddressOfFunctions);
 
                     var addressTable = MemoryMarshal.Cast<byte, int>(ImageBytes.Span.Slice(addressTableOffset, sizeof(int) * exportDirectory.NumberOfFunctions));
 
-                    var functionAddress = addressTable[functionOrdinal];
+                    var functionOffset = RvaToOffset(addressTable[ordinalTable[middle]]);
 
-                    return new ExportedFunction(RvaToOffset(functionAddress));
+                    return new ExportedFunction(functionOffset);
                 }
 
                 if (string.CompareOrdinal(functionName, name) < 0)

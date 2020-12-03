@@ -5,9 +5,6 @@ namespace Pluto.Native.Structures
     [StructLayout(LayoutKind.Explicit, Size = 40)]
     internal readonly struct ImageExportDirectory
     {
-        [FieldOffset(0x10)]
-        internal readonly int Base;
-
         [FieldOffset(0x14)]
         internal readonly int NumberOfFunctions;
 

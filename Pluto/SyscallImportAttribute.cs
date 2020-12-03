@@ -13,7 +13,7 @@ namespace Pluto
         internal string FunctionName { get; }
 
         /// <summary>
-        /// Indicates that the attributed delegate represents a syscall signature
+        /// Initialises an instance of the <see cref="SyscallImportAttribute"/> class with the DLL name and function name
         /// </summary>
         public SyscallImportAttribute(string dllName, string functionName)
         {

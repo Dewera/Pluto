@@ -11,12 +11,16 @@ A manual syscall library that supports both ntdll.dll and win32u.dll
 The example below demonstrates a basic implementation of the library
 
 ```c#
-[SyscallImport("ntdll.dll", "NtTestAlert")]
-public delegate NtStatus TestAlert();
+[SyscallImport("ntdll.dll", "NtWriteVirtualMemory")]
+public delegate NtStatus WriteProcessMemory(SafeProcessHandle processHandle, IntPtr address, in byte bytes, int size, out int bytesWritten);
 
-var syscall = new Syscall<TestAlert>();
+var syscall = new Syscall<WriteProcessMemory>();
 
-var status = syscall.Method();
+var processHandle = Process.GetProcessesByName("")[0].SafeHandle;
+
+var bytes = new byte[0];
+
+var status = syscall.Method(processHandle, IntPtr.Zero, in bytes[0], bytes.Length, out _);
 ```
 
 ---
@@ -29,12 +33,20 @@ Provides the functionality to syscall a function in a DLL
 public sealed class Syscall<T> where T : Delegate
 ```
 
+### Constructors
+
+Initialises an instance of the class with the syscall delegate
+
+```C#
+public Syscall()
+```
+
 ### Properties
 
 A delegate wrapping the syscall
 
 ```c#
-Method
+public T Method { get; }
 ```
 
 ---
@@ -50,7 +62,7 @@ public sealed class SyscallImportAttribute : Attribute
 
 ### Constructors
 
-Indicates that the attributed delegate represents a syscall signature
+Initialises an instance of the SyscallImportAttribute class with the DLL name and function name
 
 ```c#
 public SyscallImportAttribute(string, string)

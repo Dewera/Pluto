@@ -22,7 +22,7 @@ namespace Pluto
         public T Method { get; }
 
         /// <summary>
-        /// Provides the functionality to syscall a function in a DLL
+        /// Initialises an instance of the <see cref="Syscall{T}"/> class with the syscall delegate
         /// </summary>
         public Syscall()
         {

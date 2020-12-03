@@ -7,6 +7,7 @@
         <Description>A manual syscall library that supports both ntdll.dll and win32u.dll</Description>
         <RepositoryUrl>https://github.com/Dewera/Pluto</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <PackageVersion>1.0.1</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
