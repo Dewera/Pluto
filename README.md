@@ -1,5 +1,7 @@
 ## Pluto
 
+![](https://github.com/Dewera/Pluto/workflows/Continuous%20Integration/badge.svg)
+
 A manual syscall library that supports both ntdll.dll and win32u.dll
 
 ---
@@ -50,4 +52,6 @@ public sealed class SyscallImportAttribute : Attribute
 
 Indicates that the attributed delegate represents a syscall signature
 
+```c#
 public SyscallImportAttribute(string, string)
+```
