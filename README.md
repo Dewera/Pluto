@@ -35,7 +35,7 @@ public sealed class Syscall<T> where T : Delegate
 
 ### Constructors
 
-Initialises an instance of the class with the syscall delegate
+Initialises an instance of the `Syscall<T>` class with the syscall delegate
 
 ```C#
 public Syscall()
@@ -62,7 +62,7 @@ public sealed class SyscallImportAttribute : Attribute
 
 ### Constructors
 
-Initialises an instance of the SyscallImportAttribute class with the DLL name and function name
+Initialises an instance of the `SyscallImportAttribute` class with the DLL name and function name
 
 ```c#
 public SyscallImportAttribute(string, string)
