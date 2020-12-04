@@ -44,7 +44,6 @@ namespace Pluto.Tests
 
                 Assert.False(processHandle.IsInvalid);
             }
-
             else
             {
                 var syscall = new Syscall<Delegates.OpenProcess32>();

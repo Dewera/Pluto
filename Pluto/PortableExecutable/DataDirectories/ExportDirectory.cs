@@ -20,7 +20,7 @@ namespace Pluto.PortableExecutable.DataDirectories
 
             // Read the export directory
 
-            var exportDirectory = MemoryMarshal.Read<ImageExportDirectory>(ImageBytes.Span.Slice(DirectoryOffset));
+            var exportDirectory = MemoryMarshal.Read<ImageExportDirectory>(ImageBytes.Span[DirectoryOffset..]);
 
             // Read the name address table
 
@@ -42,7 +42,7 @@ namespace Pluto.PortableExecutable.DataDirectories
 
                 var nameOffset = RvaToOffset(nameAddressTable[middle]);
 
-                var nameLength = ImageBytes.Span.Slice(nameOffset).IndexOf(byte.MinValue);
+                var nameLength = ImageBytes.Span[nameOffset..].IndexOf(byte.MinValue);
 
                 var name = Encoding.UTF8.GetString(ImageBytes.Span.Slice(nameOffset, nameLength));
 
@@ -69,7 +69,6 @@ namespace Pluto.PortableExecutable.DataDirectories
                 {
                     high = middle - 1;
                 }
-
                 else
                 {
                     low = middle + 1;

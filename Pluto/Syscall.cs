@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+
 using Pluto.Assembly;
 using Pluto.Native;
 using Pluto.Native.Enumerations;
@@ -33,7 +34,8 @@ namespace Pluto
                 throw new ArgumentException("The provided delegate was not attributed with the SyscallImport attribute");
             }
 
-            if (!syscallImport.DllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase) && !syscallImport.DllName.Equals("win32u.dll", StringComparison.OrdinalIgnoreCase))
+            if (!syscallImport.DllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase)
+                && !syscallImport.DllName.Equals("win32u.dll", StringComparison.OrdinalIgnoreCase))
             {
                 throw new NotSupportedException("The provided DLL does not export any syscalls");
             }
@@ -47,7 +49,9 @@ namespace Pluto
 
             var syscallIndex = GetSyscallIndex(syscallImport.DllName, syscallImport.FunctionName);
 
-            var shellcodeBytes = Environment.Is64BitProcess ? Assembler.AssembleSyscall64(syscallIndex) : Assembler.AssembleSyscall32(syscallIndex);
+            var shellcodeBytes = Environment.Is64BitProcess
+                ? Assembler.AssembleSyscall64(syscallIndex)
+                : Assembler.AssembleSyscall32(syscallIndex);
 
             // Write the shellcode into the pinned object heap
 
@@ -84,9 +88,12 @@ namespace Pluto
 
             // Read the syscall index
 
-            var functionBytes = dllBytes.AsSpan().Slice(function.Offset);
+            var functionBytes = dllBytes.AsSpan()[function.Offset..];
 
-            return MemoryMarshal.Read<int>(Environment.Is64BitProcess ? functionBytes.Slice(Constants.SyscallIndexOffset64) : functionBytes.Slice(Constants.SyscallIndexOffset32));
+            return MemoryMarshal.Read<int>(
+                Environment.Is64BitProcess
+                ? functionBytes[Constants.SyscallIndexOffset64..]
+                : functionBytes[Constants.SyscallIndexOffset32..]);
         }
     }
 }
