@@ -79,7 +79,7 @@ namespace Pluto
 
             if (function is null)
             {
-                throw new ApplicationException($"Failed to find the function {functionName} in the DLL {dllName}");
+                throw new EntryPointNotFoundException($"Failed to find the function {functionName} in the DLL {dllName}");
             }
 
             // Read the syscall index
