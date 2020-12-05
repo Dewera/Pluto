@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Pluto.Assembly;
@@ -8,6 +7,7 @@ using Pluto.Native;
 using Pluto.Native.Enumerations;
 using Pluto.Native.PInvoke;
 using Pluto.PortableExecutable;
+using Pluto.Utilities;
 
 namespace Pluto
 {
@@ -38,16 +38,45 @@ namespace Pluto
                 throw new NotSupportedException("The provided DLL does not export any syscalls");
             }
 
-            Method = CreateSyscall(syscallImport);
+            Method = CreateSyscall(syscallImport.DllName, syscallImport.FunctionName);
         }
 
-        private static T CreateSyscall(SyscallImportAttribute syscallImport)
+        private static T CreateSyscall(string dllName, string functionName)
         {
+            var dllBytes = dllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase) ? Registry.NtdllBytes.Value : Registry.Win32UBytes.Value;
+
+            // Look for the function in the DLL
+
+            var peImage = new PeImage(dllBytes);
+
+            var function = peImage.ExportDirectory.GetExportedFunction(functionName);
+
+            if (function is null)
+            {
+                throw new EntryPointNotFoundException($"Failed to find the function {functionName} in the DLL {dllName}");
+            }
+
             // Create the shellcode used to perform the syscall
 
-            var syscallIndex = GetSyscallIndex(syscallImport.DllName, syscallImport.FunctionName);
+            Span<byte> shellcodeBytes;
 
-            var shellcodeBytes = Environment.Is64BitProcess ? Assembler.AssembleSyscall64(syscallIndex) : Assembler.AssembleSyscall32(syscallIndex);
+            if (Environment.Is64BitProcess)
+            {
+                // Read the syscall index
+
+                var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span.Slice(function.Offset + Constants.SyscallIndexOffset64));
+
+                shellcodeBytes = Assembler.AssembleSyscall64(syscallIndex);
+            }
+
+            else
+            {
+                // Read the syscall index
+
+                var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span.Slice(function.Offset + Constants.SyscallIndexOffset32));
+
+                shellcodeBytes = Assembler.AssembleSyscall32(syscallIndex);
+            }
 
             // Write the shellcode into the pinned object heap
 
@@ -65,28 +94,6 @@ namespace Pluto
             }
 
             return Marshal.GetDelegateForFunctionPointer<T>(shellcodeAddress);
-        }
-
-        private static int GetSyscallIndex(string dllName, string functionName)
-        {
-            var dllBytes = File.ReadAllBytes(Path.Combine(Environment.SystemDirectory, dllName));
-
-            // Retrieve the function
-
-            var peImage = new PeImage(dllBytes);
-
-            var function = peImage.ExportDirectory.GetExportedFunction(functionName);
-
-            if (function is null)
-            {
-                throw new ApplicationException($"Failed to find the function {functionName} in the DLL {dllName}");
-            }
-
-            // Read the syscall index
-
-            var functionBytes = dllBytes.AsSpan().Slice(function.Offset);
-
-            return MemoryMarshal.Read<int>(Environment.Is64BitProcess ? functionBytes.Slice(Constants.SyscallIndexOffset64) : functionBytes.Slice(Constants.SyscallIndexOffset32));
         }
     }
 }

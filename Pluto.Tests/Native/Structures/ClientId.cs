@@ -6,7 +6,7 @@ namespace Pluto.Tests.Native.Structures
     internal readonly struct ClientId32
     {
         [FieldOffset(0x0)]
-        internal readonly int UniqueProcess;
+        private readonly int UniqueProcess;
 
         internal ClientId32(int uniqueProcess)
         {
@@ -18,7 +18,7 @@ namespace Pluto.Tests.Native.Structures
     internal readonly struct ClientId64
     {
         [FieldOffset(0x0)]
-        internal readonly long UniqueProcess;
+        private readonly long UniqueProcess;
 
         internal ClientId64(long uniqueProcess)
         {
