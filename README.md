@@ -2,7 +2,7 @@
 
 ![](https://github.com/Dewera/Pluto/workflows/Continuous%20Integration/badge.svg)
 
-A manual syscall library that supports both ntdll.dll and win32u.dll
+A manual system call library that supports functions from both ntdll.dll and win32u.dll
 
 ---
 

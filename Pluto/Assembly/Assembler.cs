@@ -16,15 +16,25 @@ namespace Pluto.Assembly
 
             instructions.AddRange(BitConverter.GetBytes(syscallIndex));
 
-            // mov edx, [Wow64Transition]
+            if (Environment.Is64BitOperatingSystem)
+            {
+                // call DWORD PTR ds:[Wow64Transition]
 
-            instructions.Add(0xBA);
+                instructions.AddRange(new byte[] {0xFF, 0x15});
 
-            instructions.AddRange(BitConverter.GetBytes(Marshal.ReadInt32(NativeLibrary.GetExport(NativeLibrary.Load("ntdll.dll"), "Wow64Transition"))));
+                instructions.AddRange(BitConverter.GetBytes(NativeLibrary.GetExport(NativeLibrary.Load("ntdll.dll"), "Wow64Transition").ToInt32()));
+            }
 
-            // call edx
+            else
+            {
+                // mov edx, esp
 
-            instructions.AddRange(new byte[] {0xFF, 0xD2});
+                instructions.AddRange(new byte[] {0x89, 0xE2});
+
+                // sysenter
+
+                instructions.AddRange(new byte[] {0xF, 0x34});
+            }
 
             // ret
 

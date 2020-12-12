@@ -4,10 +4,10 @@
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <Authors>Dewera</Authors>
-        <Description>A manual syscall library that supports both ntdll.dll and win32u.dll</Description>
+        <Description>A manual system call library that supports functions from both ntdll.dll and win32u.dll</Description>
         <RepositoryUrl>https://github.com/Dewera/Pluto</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageVersion>1.1.0</PackageVersion>
+        <PackageVersion>1.1.1</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

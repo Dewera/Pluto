@@ -43,7 +43,7 @@ namespace Pluto
 
         private static T CreateSyscall(string dllName, string functionName)
         {
-            var dllBytes = dllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase) ? Registry.NtdllBytes.Value : Registry.Win32UBytes.Value;
+            var dllBytes = dllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase) ? Registry.NtdllBytes : Registry.Win32UBytes;
 
             // Look for the function in the DLL
 
