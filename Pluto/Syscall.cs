@@ -9,6 +9,8 @@ using Pluto.Native.PInvoke;
 using Pluto.PortableExecutable;
 using Pluto.Utilities;
 
+[assembly: CLSCompliant(true)]
+
 namespace Pluto
 {
     /// <summary>
