@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Pluto.Tests.Native.Enumerations;
 using Pluto.Tests.Native.PInvoke;
-using Pluto.Tests.Native.Structures;
 using Xunit;
 
 namespace Pluto.Tests
@@ -16,11 +15,15 @@ namespace Pluto.Tests
 
         private readonly IntPtr _testAddress;
 
+        private readonly int _testValue;
+
         public SyscallTests()
         {
             _process = Process.GetCurrentProcess();
 
             _testAddress = Marshal.AllocHGlobal(Environment.SystemPageSize);
+
+            _testValue = 1024;
         }
 
         public void Dispose()
@@ -29,45 +32,11 @@ namespace Pluto.Tests
         }
 
         [Fact]
-        public void TestNtOpenProcess()
-        {
-            if (Environment.Is64BitProcess)
-            {
-                var syscall = new Syscall<Delegates.OpenProcess64>();
-
-                var status = syscall.Method(out var processHandle, AccessMask.ProcessAllAccess, new ObjectAttributes64(), new ClientId64(_process.Id));
-
-                if (status != NtStatus.Success)
-                {
-                    throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
-                }
-
-                Assert.False(processHandle.IsInvalid);
-            }
-
-            else
-            {
-                var syscall = new Syscall<Delegates.OpenProcess32>();
-
-                var status = syscall.Method(out var processHandle, AccessMask.ProcessAllAccess, new ObjectAttributes32(), new ClientId32(_process.Id));
-
-                if (status != NtStatus.Success)
-                {
-                    throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
-                }
-
-                Assert.False(processHandle.IsInvalid);
-            }
-        }
-
-        [Fact]
         public void TestNtReadVirtualMemory()
         {
-            const int testNumber = 1024;
+            Marshal.WriteInt32(_testAddress, _testValue);
 
-            Marshal.WriteInt32(_testAddress, testNumber);
-
-            var syscall = new Syscall<Delegates.ReadProcessMemory>();
+            var syscall = new Syscall<Signatures.NtReadVirtualMemory>();
 
             Span<byte> bytes = stackalloc byte[sizeof(int)];
 
@@ -78,19 +47,17 @@ namespace Pluto.Tests
                 throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
             }
 
-            Assert.Equal(testNumber, MemoryMarshal.Read<int>(bytes));
+            Assert.Equal(_testValue, MemoryMarshal.Read<int>(bytes));
         }
 
         [Fact]
         public void TestNtWriteVirtualMemory()
         {
-            const int testNumber = 1024;
-
-            var syscall = new Syscall<Delegates.WriteProcessMemory>();
+            var syscall = new Syscall<Signatures.NtWriteVirtualMemory>();
 
             Span<byte> bytes = stackalloc byte[sizeof(int)];
 
-            MemoryMarshal.Write(bytes, ref Unsafe.AsRef(testNumber));
+            MemoryMarshal.Write(bytes, ref Unsafe.AsRef(_testValue));
 
             var status = syscall.Method(_process.SafeHandle, _testAddress, in bytes[0], bytes.Length, out _);
 
@@ -99,7 +66,7 @@ namespace Pluto.Tests
                 throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
             }
 
-            Assert.Equal(testNumber, Marshal.ReadInt32(_testAddress));
+            Assert.Equal(_testValue, Marshal.ReadInt32(_testAddress));
         }
     }
 }

@@ -19,9 +19,9 @@ The example below demonstrates a basic implementation of the library
 
 ```c#
 [SyscallImport("ntdll.dll", "NtFlushInstructionCache")]
-public delegate NtStatus FlushInstructionCache(SafeProcessHandle processHandle, IntPtr address, int bytes);
+public delegate NtStatus Signature(SafeProcessHandle processHandle, IntPtr address, int bytes);
 
-var syscall = new Syscall<FlushInstructionCache>();
+var syscall = new Syscall<Signature>();
 
 var processHandle = Process.GetProcessesByName("")[0].SafeHandle;
 
@@ -70,5 +70,5 @@ public sealed class SyscallImportAttribute : Attribute
 Initialises an instance of the `SyscallImportAttribute` class with the DLL name and function name
 
 ```c#
-public SyscallImportAttribute(string, string);
+public SyscallImportAttribute(string dllName, string functionName);
 ```

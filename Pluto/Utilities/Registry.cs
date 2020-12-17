@@ -11,9 +11,16 @@ namespace Pluto.Utilities
 
         static Registry()
         {
-            NtdllBytes = File.ReadAllBytes(Path.Combine(Environment.SystemDirectory, "ntdll.dll"));
+            var systemDirectoryPath = Environment.SystemDirectory;
 
-            Win32UBytes = File.ReadAllBytes(Path.Combine(Environment.SystemDirectory, "win32u.dll"));
+            if (Environment.Is64BitOperatingSystem && !Environment.Is64BitProcess)
+            {
+                systemDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            }
+
+            NtdllBytes = File.ReadAllBytes(Path.Combine(systemDirectoryPath, "ntdll.dll"));
+
+            Win32UBytes = File.ReadAllBytes(Path.Combine(systemDirectoryPath, "win32u.dll"));
         }
     }
 }
