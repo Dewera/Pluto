@@ -70,5 +70,5 @@ public sealed class SyscallImportAttribute : Attribute
 Initialises an instance of the `SyscallImportAttribute` class with the DLL name and function name
 
 ```c#
-public SyscallImportAttribute(string dllName, string functionName);
+public SyscallImportAttribute(string, string);
 ```
