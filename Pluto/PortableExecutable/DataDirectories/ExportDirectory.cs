@@ -22,12 +22,6 @@ namespace Pluto.PortableExecutable.DataDirectories
 
             var exportDirectory = MemoryMarshal.Read<ImageExportDirectory>(ImageBytes.Span.Slice(DirectoryOffset));
 
-            // Read the name address table
-
-            var nameAddressTableOffset = RvaToOffset(exportDirectory.AddressOfNames);
-
-            var nameAddressTable = MemoryMarshal.Cast<byte, int>(ImageBytes.Span.Slice(nameAddressTableOffset, sizeof(int) * exportDirectory.NumberOfNames));
-
             // Search the name address table for the corresponding name
 
             var low = 0;
@@ -38,34 +32,34 @@ namespace Pluto.PortableExecutable.DataDirectories
             {
                 var middle = (low + high) / 2;
 
-                // Read the name
+                // Read the name at the current index
 
-                var nameOffset = RvaToOffset(nameAddressTable[middle]);
+                var currentNameOffsetOffset = RvaToOffset(exportDirectory.AddressOfNames) + sizeof(int) * middle;
 
-                var nameLength = ImageBytes.Span.Slice(nameOffset).IndexOf(byte.MinValue);
+                var currentNameOffset = RvaToOffset(MemoryMarshal.Read<int>(ImageBytes.Span.Slice(currentNameOffsetOffset)));
 
-                var name = Encoding.UTF8.GetString(ImageBytes.Span.Slice(nameOffset, nameLength));
+                var currentNameLength = ImageBytes.Span.Slice(currentNameOffset).IndexOf(byte.MinValue);
 
-                if (functionName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                var currentName = Encoding.UTF8.GetString(ImageBytes.Span.Slice(currentNameOffset, currentNameLength));
+
+                if (functionName.Equals(currentName, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Read the name ordinal table
+                    // Read the function ordinal
 
-                    var ordinalTableOffset = RvaToOffset(exportDirectory.AddressOfNameOrdinals);
+                    var functionOrdinalOffset = RvaToOffset(exportDirectory.AddressOfNameOrdinals) + sizeof(short) * middle;
 
-                    var ordinalTable = MemoryMarshal.Cast<byte, short>(ImageBytes.Span.Slice(ordinalTableOffset, sizeof(short) * exportDirectory.NumberOfNames));
+                    var functionOrdinal = MemoryMarshal.Read<short>(ImageBytes.Span.Slice(functionOrdinalOffset));
 
-                    // Read the address table
+                    // Read the function address
 
-                    var addressTableOffset = RvaToOffset(exportDirectory.AddressOfFunctions);
+                    var functionAddressOffset = RvaToOffset(exportDirectory.AddressOfFunctions) + sizeof(int) * functionOrdinal;
 
-                    var addressTable = MemoryMarshal.Cast<byte, int>(ImageBytes.Span.Slice(addressTableOffset, sizeof(int) * exportDirectory.NumberOfFunctions));
+                    var functionAddress = MemoryMarshal.Read<int>(ImageBytes.Span.Slice(functionAddressOffset));
 
-                    var functionOffset = RvaToOffset(addressTable[ordinalTable[middle]]);
-
-                    return new ExportedFunction(functionOffset);
+                    return new ExportedFunction(RvaToOffset(functionAddress));
                 }
 
-                if (string.CompareOrdinal(functionName, name) < 0)
+                if (string.CompareOrdinal(functionName, currentName) < 0)
                 {
                     high = middle - 1;
                 }

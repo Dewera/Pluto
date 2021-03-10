@@ -8,7 +8,7 @@ A manual system call library that supports functions from both ntdll.dll and win
 
 ### Notable features
 
-- Dynamic resolution of syscall indices
+- Dynamic resolution of syscall indices from disk
 - x86 and x64 support
 
 ---
@@ -18,8 +18,8 @@ A manual system call library that supports functions from both ntdll.dll and win
 The example below demonstrates a basic implementation of the library
 
 ```c#
-[SyscallImport("ntdll.dll", "NtFlushInstructionCache")]
-public delegate NtStatus Signature(SafeProcessHandle processHandle, IntPtr address, int bytes);
+[SyscallImport("ntdll.dll")]
+public delegate NtStatus NtFlushInstructionCache(SafeProcessHandle processHandle, IntPtr address, int bytes);
 
 var syscall = new Syscall<Signature>();
 
@@ -67,8 +67,8 @@ public sealed class SyscallImportAttribute : Attribute
 
 ### Constructors
 
-Initialises an instance of the `SyscallImportAttribute` class with the DLL name and function name
+Initialises an instance of the `SyscallImportAttribute` class with the DLL name
 
 ```c#
-public SyscallImportAttribute(string, string);
+public SyscallImportAttribute(string);
 ```

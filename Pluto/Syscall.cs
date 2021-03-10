@@ -40,10 +40,10 @@ namespace Pluto
                 throw new NotSupportedException("The provided DLL does not export any syscalls");
             }
 
-            Method = CreateSyscall(syscallImport.DllName, syscallImport.FunctionName);
+            Method = CreateSyscall(syscallImport.DllName, typeof(T).Name);
         }
 
-        private static T CreateSyscall(string dllName, string functionName)
+        private static T CreateSyscall(string dllName, string entryPoint)
         {
             var dllBytes = dllName.Equals("ntdll.dll", StringComparison.OrdinalIgnoreCase) ? Registry.NtdllBytes : Registry.Win32UBytes;
 
@@ -51,11 +51,11 @@ namespace Pluto
 
             var peImage = new PeImage(dllBytes);
 
-            var function = peImage.ExportDirectory.GetExportedFunction(functionName);
+            var function = peImage.ExportDirectory.GetExportedFunction(entryPoint);
 
             if (function is null)
             {
-                throw new EntryPointNotFoundException($"Failed to find the function {functionName} in the DLL {dllName}");
+                throw new EntryPointNotFoundException($"Failed to find the function {entryPoint} in the DLL {dllName}");
             }
 
             // Create the shellcode used to perform the syscall

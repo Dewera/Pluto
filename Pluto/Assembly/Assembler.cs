@@ -40,7 +40,7 @@ namespace Pluto.Assembly
 
             instructions.Add(0xC3);
 
-            return instructions.ToArray();
+            return CollectionsMarshal.AsSpan(instructions);
         }
 
         internal static Span<byte> AssembleSyscall64(int syscallIndex)
@@ -65,7 +65,7 @@ namespace Pluto.Assembly
 
             instructions.Add(0xC3);
 
-            return instructions.ToArray();
+            return CollectionsMarshal.AsSpan(instructions);
         }
     }
 }

@@ -10,16 +10,12 @@ namespace Pluto
     {
         internal string DllName { get; }
 
-        internal string FunctionName { get; }
-
         /// <summary>
-        /// Initialises an instance of the <see cref="SyscallImportAttribute"/> class with the DLL name and function name
+        /// Initialises an instance of the <see cref="SyscallImportAttribute"/> class with the DLL name
         /// </summary>
-        public SyscallImportAttribute(string dllName, string functionName)
+        public SyscallImportAttribute(string dllName)
         {
             DllName = dllName;
-
-            FunctionName = functionName;
         }
     }
 }
