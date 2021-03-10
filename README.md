@@ -21,7 +21,7 @@ The example below demonstrates a basic implementation of the library
 [SyscallImport("ntdll.dll")]
 public delegate NtStatus NtFlushInstructionCache(SafeProcessHandle processHandle, IntPtr address, int bytes);
 
-var syscall = new Syscall<Signature>();
+var syscall = new Syscall<NtFlushInstructionCache>();
 
 var processHandle = Process.GetProcessesByName("")[0].SafeHandle;
 
