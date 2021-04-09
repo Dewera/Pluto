@@ -19,13 +19,13 @@ The example below demonstrates a basic implementation of the library
 
 ```c#
 [SyscallImport("ntdll.dll")]
-public delegate NtStatus NtFlushInstructionCache(SafeProcessHandle processHandle, IntPtr address, int bytes);
+public delegate NtStatus NtClose(IntPtr handle);
 
-var syscall = new Syscall<NtFlushInstructionCache>();
+var syscall = new Syscall<NtClose>();
 
-var processHandle = Process.GetProcessesByName("")[0].SafeHandle;
+var handle = IntPtr.Zero;
 
-var status = syscall.Method(processHandle, IntPtr.Zero, 0); 
+var status = syscall.Method(handle); 
 ```
 
 ---
