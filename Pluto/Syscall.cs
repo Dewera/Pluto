@@ -2,11 +2,12 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Pluto.Assembly;
 using Pluto.Native;
 using Pluto.Native.Enumerations;
 using Pluto.Native.PInvoke;
 using Pluto.PortableExecutable;
+using Pluto.Shellcode;
+using Pluto.Shellcode.Structures;
 using Pluto.Utilities;
 
 [assembly: CLSCompliant(true)]
@@ -55,30 +56,18 @@ namespace Pluto
 
             if (function is null)
             {
-                throw new EntryPointNotFoundException($"Failed to find the function {entryPoint} in the DLL {dllName}");
+                throw new EntryPointNotFoundException($"Failed to find the function {entryPoint} in the module {dllName}");
             }
 
-            // Create the shellcode used to perform the syscall
+            // Read the syscall index
 
-            Span<byte> shellcodeBytes;
+            var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span[(function.Offset + (Environment.Is64BitProcess ? Constants.SyscallIndexOffset64 : Constants.SyscallIndexOffset32))..]);
 
-            if (Environment.Is64BitProcess)
-            {
-                // Read the syscall index
+            // Assemble the shellcode used to perform the syscall
 
-                var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span.Slice(function.Offset + Constants.SyscallIndexOffset64));
+            var syscallDescriptor = new SyscallDescriptor(syscallIndex);
 
-                shellcodeBytes = Assembler.AssembleSyscall64(syscallIndex);
-            }
-
-            else
-            {
-                // Read the syscall index
-
-                var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span.Slice(function.Offset + Constants.SyscallIndexOffset32));
-
-                shellcodeBytes = Assembler.AssembleSyscall32(syscallIndex);
-            }
+            var shellcodeBytes = Environment.Is64BitProcess ? ShellcodeAssembler.AssembleSyscall64(syscallDescriptor) : ShellcodeAssembler.AssembleSyscall32(syscallDescriptor);
 
             // Write the shellcode into the pinned object heap
 

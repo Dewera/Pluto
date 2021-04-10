@@ -7,7 +7,7 @@
         <Description>A manual system call library that supports functions from both ntdll.dll and win32u.dll</Description>
         <RepositoryUrl>https://github.com/Dewera/Pluto</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageVersion>1.2.0</PackageVersion>
+        <PackageVersion>1.2.1</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

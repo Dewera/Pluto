@@ -20,7 +20,7 @@ namespace Pluto.PortableExecutable.DataDirectories
 
             // Read the export directory
 
-            var exportDirectory = MemoryMarshal.Read<ImageExportDirectory>(ImageBytes.Span.Slice(DirectoryOffset));
+            var exportDirectory = MemoryMarshal.Read<ImageExportDirectory>(ImageBytes.Span[DirectoryOffset..]);
 
             // Search the name address table for the corresponding name
 
@@ -36,9 +36,9 @@ namespace Pluto.PortableExecutable.DataDirectories
 
                 var currentNameOffsetOffset = RvaToOffset(exportDirectory.AddressOfNames) + sizeof(int) * middle;
 
-                var currentNameOffset = RvaToOffset(MemoryMarshal.Read<int>(ImageBytes.Span.Slice(currentNameOffsetOffset)));
+                var currentNameOffset = RvaToOffset(MemoryMarshal.Read<int>(ImageBytes.Span[currentNameOffsetOffset..]));
 
-                var currentNameLength = ImageBytes.Span.Slice(currentNameOffset).IndexOf(byte.MinValue);
+                var currentNameLength = ImageBytes.Span[currentNameOffset..].IndexOf(byte.MinValue);
 
                 var currentName = Encoding.UTF8.GetString(ImageBytes.Span.Slice(currentNameOffset, currentNameLength));
 
@@ -48,13 +48,13 @@ namespace Pluto.PortableExecutable.DataDirectories
 
                     var functionOrdinalOffset = RvaToOffset(exportDirectory.AddressOfNameOrdinals) + sizeof(short) * middle;
 
-                    var functionOrdinal = MemoryMarshal.Read<short>(ImageBytes.Span.Slice(functionOrdinalOffset));
+                    var functionOrdinal = MemoryMarshal.Read<short>(ImageBytes.Span[functionOrdinalOffset..]);
 
                     // Read the function address
 
                     var functionAddressOffset = RvaToOffset(exportDirectory.AddressOfFunctions) + sizeof(int) * functionOrdinal;
 
-                    var functionAddress = MemoryMarshal.Read<int>(ImageBytes.Span.Slice(functionAddressOffset));
+                    var functionAddress = MemoryMarshal.Read<int>(ImageBytes.Span[functionAddressOffset..]);
 
                     return new ExportedFunction(RvaToOffset(functionAddress));
                 }
