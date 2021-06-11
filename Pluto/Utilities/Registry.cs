@@ -6,7 +6,6 @@ namespace Pluto.Utilities
     internal static class Registry
     {
         internal static Memory<byte> NtdllBytes { get; }
-
         internal static Memory<byte> Win32UBytes { get; }
 
         static Registry()
@@ -19,7 +18,6 @@ namespace Pluto.Utilities
             }
 
             NtdllBytes = File.ReadAllBytes(Path.Combine(systemDirectoryPath, "ntdll.dll"));
-
             Win32UBytes = File.ReadAllBytes(Path.Combine(systemDirectoryPath, "win32u.dll"));
         }
     }

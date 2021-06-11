@@ -1,4 +1,4 @@
-﻿namespace Pluto.Tests.Native.Enumerations
+﻿namespace Pluto.Tests.Native.Enums
 {
     internal enum NtStatus
     {

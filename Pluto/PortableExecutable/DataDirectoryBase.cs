@@ -3,25 +3,23 @@ using System.Reflection.PortableExecutable;
 
 namespace Pluto.PortableExecutable
 {
-    internal abstract class DataDirectory
+    internal abstract class DataDirectoryBase
     {
         private protected int DirectoryOffset { get; }
-
         private protected Memory<byte> ImageBytes { get; }
-
         private protected bool IsValid { get; }
 
         private readonly PEHeaders _headers;
 
-        private protected DataDirectory(PEHeaders headers, Memory<byte> imageBytes, DirectoryEntry directory)
+        private protected DataDirectoryBase(DirectoryEntry directory, PEHeaders headers, Memory<byte> imageBytes)
         {
+            headers.TryGetDirectoryOffset(directory, out var directoryOffset);
+
             _headers = headers;
 
-            IsValid = headers.TryGetDirectoryOffset(directory, out var directoryOffset);
-
             DirectoryOffset = directoryOffset;
-
             ImageBytes = imageBytes;
+            IsValid = directoryOffset != -1;
         }
 
         private protected int RvaToOffset(int rva)

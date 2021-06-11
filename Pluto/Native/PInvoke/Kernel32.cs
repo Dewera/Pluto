@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Pluto.Native.Enumerations;
+using Pluto.Native.Enums;
 
 namespace Pluto.Native.PInvoke
 {

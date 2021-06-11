@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using Pluto.Tests.Native.Enumerations;
+using Pluto.Tests.Native.Enums;
 
 namespace Pluto.Tests.Native.PInvoke
 {

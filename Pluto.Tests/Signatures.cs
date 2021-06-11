@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Win32.SafeHandles;
-using Pluto.Tests.Native.Enumerations;
+using Pluto.Tests.Native.Enums;
 
 namespace Pluto.Tests
 {

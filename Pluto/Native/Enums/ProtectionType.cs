@@ -1,4 +1,4 @@
-﻿namespace Pluto.Native.Enumerations
+﻿namespace Pluto.Native.Enums
 {
     internal enum ProtectionType
     {

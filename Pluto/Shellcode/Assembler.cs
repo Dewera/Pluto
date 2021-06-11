@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Pluto.Shellcode.Structures;
+using Pluto.Shellcode.Records;
 
 namespace Pluto.Shellcode
 {
-    internal static class ShellcodeAssembler
+    internal static class Assembler
     {
         internal static Span<byte> AssembleSyscall32(SyscallDescriptor syscallDescriptor)
         {
@@ -14,7 +14,6 @@ namespace Pluto.Shellcode
             // mov eax, Index
 
             shellcode.Add(0xB8);
-
             shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
 
             if (Environment.Is64BitOperatingSystem)
@@ -22,7 +21,6 @@ namespace Pluto.Shellcode
                 // call DWORD PTR ds:[Wow64Transition]
 
                 shellcode.AddRange(new byte[] {0xFF, 0x15});
-
                 shellcode.AddRange(BitConverter.GetBytes(NativeLibrary.GetExport(NativeLibrary.Load("ntdll.dll"), "Wow64Transition").ToInt32()));
             }
 
@@ -55,7 +53,6 @@ namespace Pluto.Shellcode
             // mov eax, Index
 
             shellcode.Add(0xB8);
-
             shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
 
             // syscall

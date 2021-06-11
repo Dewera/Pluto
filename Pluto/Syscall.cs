@@ -3,11 +3,11 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Pluto.Native;
-using Pluto.Native.Enumerations;
+using Pluto.Native.Enums;
 using Pluto.Native.PInvoke;
 using Pluto.PortableExecutable;
 using Pluto.Shellcode;
-using Pluto.Shellcode.Structures;
+using Pluto.Shellcode.Records;
 using Pluto.Utilities;
 
 [assembly: CLSCompliant(true)]
@@ -51,7 +51,6 @@ namespace Pluto
             // Look for the function in the DLL
 
             var peImage = new PeImage(dllBytes);
-
             var function = peImage.ExportDirectory.GetExportedFunction(entryPoint);
 
             if (function is null)
@@ -61,18 +60,17 @@ namespace Pluto
 
             // Read the syscall index
 
-            var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span[(function.Offset + (Environment.Is64BitProcess ? Constants.SyscallIndexOffset64 : Constants.SyscallIndexOffset32))..]);
+            var indexOffset = Environment.Is64BitProcess ? Constants.SyscallIndexOffset64 : Constants.SyscallIndexOffset32;
+            var syscallIndex = MemoryMarshal.Read<int>(dllBytes.Span[(function.Offset + indexOffset)..]);
 
             // Assemble the shellcode used to perform the syscall
 
             var syscallDescriptor = new SyscallDescriptor(syscallIndex);
-
-            var shellcodeBytes = Environment.Is64BitProcess ? ShellcodeAssembler.AssembleSyscall64(syscallDescriptor) : ShellcodeAssembler.AssembleSyscall32(syscallDescriptor);
+            var shellcodeBytes = Environment.Is64BitProcess ? Assembler.AssembleSyscall64(syscallDescriptor) : Assembler.AssembleSyscall32(syscallDescriptor);
 
             // Write the shellcode into the pinned object heap
 
             var pinnedArray = GC.AllocateArray<byte>(shellcodeBytes.Length, true);
-
             shellcodeBytes.CopyTo(pinnedArray);
 
             // Wrap the shellcode in a managed delegate
