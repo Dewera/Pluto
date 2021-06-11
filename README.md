@@ -21,10 +21,9 @@ The example below demonstrates a basic implementation of the library
 [SyscallImport("ntdll.dll")]
 public delegate NtStatus NtClose(IntPtr handle);
 
-var syscall = new Syscall<NtClose>();
-
 var handle = IntPtr.Zero;
 
+var syscall = new Syscall<NtClose>();
 var status = syscall.Method(handle); 
 ```
 
