@@ -3,67 +3,52 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Pluto.Shellcode.Records;
 
-namespace Pluto.Shellcode
+namespace Pluto.Shellcode;
+
+internal static class Assembler
 {
-    internal static class Assembler
+    internal static Span<byte> AssembleSyscall32(SyscallDescriptor syscallDescriptor)
     {
-        internal static Span<byte> AssembleSyscall32(SyscallDescriptor syscallDescriptor)
-        {
-            var shellcode = new List<byte>();
+        var shellcode = new List<byte>();
 
-            // mov eax, Index
+        // mov eax, Index
 
-            shellcode.Add(0xB8);
-            shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
+        shellcode.Add(0xB8);
+        shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
 
-            if (Environment.Is64BitOperatingSystem)
-            {
-                // call DWORD PTR ds:[Wow64Transition]
+        // call DWORD PTR ds:[Wow64Transition]
 
-                shellcode.AddRange(new byte[] {0xFF, 0x15});
-                shellcode.AddRange(BitConverter.GetBytes(NativeLibrary.GetExport(NativeLibrary.Load("ntdll.dll"), "Wow64Transition").ToInt32()));
-            }
+        shellcode.AddRange(new byte[] { 0xFF, 0x15 });
+        shellcode.AddRange(BitConverter.GetBytes(NativeLibrary.GetExport(NativeLibrary.Load("ntdll.dll"), "Wow64Transition").ToInt32()));
 
-            else
-            {
-                // mov edx, esp
+        // ret
 
-                shellcode.AddRange(new byte[] {0x89, 0xE2});
+        shellcode.Add(0xC3);
 
-                // sysenter
+        return CollectionsMarshal.AsSpan(shellcode);
+    }
 
-                shellcode.AddRange(new byte[] {0xF, 0x34});
-            }
+    internal static Span<byte> AssembleSyscall64(SyscallDescriptor syscallDescriptor)
+    {
+        var shellcode = new List<byte>();
 
-            // ret
+        // mov r10, rcx
 
-            shellcode.Add(0xC3);
+        shellcode.AddRange(new byte[] { 0x4C, 0x8B, 0xD1 });
 
-            return CollectionsMarshal.AsSpan(shellcode);
-        }
+        // mov eax, Index
 
-        internal static Span<byte> AssembleSyscall64(SyscallDescriptor syscallDescriptor)
-        {
-            var shellcode = new List<byte>();
+        shellcode.Add(0xB8);
+        shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
 
-            // mov r10, rcx
+        // syscall
 
-            shellcode.AddRange(new byte[] {0x4C, 0x8B, 0xD1});
+        shellcode.AddRange(new byte[] { 0xF, 0x5 });
 
-            // mov eax, Index
+        // ret
 
-            shellcode.Add(0xB8);
-            shellcode.AddRange(BitConverter.GetBytes(syscallDescriptor.Index));
+        shellcode.Add(0xC3);
 
-            // syscall
-
-            shellcode.AddRange(new byte[] {0xF, 0x5});
-
-            // ret
-
-            shellcode.Add(0xC3);
-
-            return CollectionsMarshal.AsSpan(shellcode);
-        }
+        return CollectionsMarshal.AsSpan(shellcode);
     }
 }

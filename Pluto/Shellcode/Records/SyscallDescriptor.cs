@@ -1,4 +1,3 @@
-﻿namespace Pluto.Shellcode.Records
-{
-    internal sealed record SyscallDescriptor(int Index);
-}
+﻿namespace Pluto.Shellcode.Records;
+
+internal sealed record SyscallDescriptor(int Index);

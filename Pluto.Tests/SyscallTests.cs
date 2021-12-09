@@ -7,59 +7,58 @@ using Pluto.Tests.Native.Enums;
 using Pluto.Tests.Native.PInvoke;
 using Xunit;
 
-namespace Pluto.Tests
+namespace Pluto.Tests;
+
+public sealed class SyscallTests : IDisposable
 {
-    public sealed class SyscallTests : IDisposable
+    private readonly Process _process;
+    private readonly IntPtr _testAddress;
+    private readonly int _testValue;
+
+    public SyscallTests()
     {
-        private readonly Process _process;
-        private readonly IntPtr _testAddress;
-        private readonly int _testValue;
+        _process = Process.GetCurrentProcess();
+        _testAddress = Marshal.AllocHGlobal(Environment.SystemPageSize);
+        _testValue = 1024;
+    }
 
-        public SyscallTests()
+    public void Dispose()
+    {
+        Marshal.FreeHGlobal(_testAddress);
+    }
+
+    [Fact]
+    public void TestNtReadVirtualMemory()
+    {
+        Marshal.WriteInt32(_testAddress, _testValue);
+
+        Span<byte> bytes = stackalloc byte[sizeof(int)];
+
+        var syscall = new Syscall<Signatures.NtReadVirtualMemory>();
+        var status = syscall.Method(_process.SafeHandle, _testAddress, out bytes[0], bytes.Length, out _);
+
+        if (status != NtStatus.Success)
         {
-            _process = Process.GetCurrentProcess();
-            _testAddress = Marshal.AllocHGlobal(Environment.SystemPageSize);
-            _testValue = 1024;
+            throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
         }
 
-        public void Dispose()
+        Assert.Equal(_testValue, MemoryMarshal.Read<int>(bytes));
+    }
+
+    [Fact]
+    public void TestNtWriteVirtualMemory()
+    {
+        Span<byte> bytes = stackalloc byte[sizeof(int)];
+        MemoryMarshal.Write(bytes, ref Unsafe.AsRef(_testValue));
+
+        var syscall = new Syscall<Signatures.NtWriteVirtualMemory>();
+        var status = syscall.Method(_process.SafeHandle, _testAddress, in bytes[0], bytes.Length, out _);
+
+        if (status != NtStatus.Success)
         {
-            Marshal.FreeHGlobal(_testAddress);
+            throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
         }
 
-        [Fact]
-        public void TestNtReadVirtualMemory()
-        {
-            Marshal.WriteInt32(_testAddress, _testValue);
-
-            Span<byte> bytes = stackalloc byte[sizeof(int)];
-
-            var syscall = new Syscall<Signatures.NtReadVirtualMemory>();
-            var status = syscall.Method(_process.SafeHandle, _testAddress, out bytes[0], bytes.Length, out _);
-
-            if (status != NtStatus.Success)
-            {
-                throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
-            }
-
-            Assert.Equal(_testValue, MemoryMarshal.Read<int>(bytes));
-        }
-
-        [Fact]
-        public void TestNtWriteVirtualMemory()
-        {
-            Span<byte> bytes = stackalloc byte[sizeof(int)];
-            MemoryMarshal.Write(bytes, ref Unsafe.AsRef(_testValue));
-
-            var syscall = new Syscall<Signatures.NtWriteVirtualMemory>();
-            var status = syscall.Method(_process.SafeHandle, _testAddress, in bytes[0], bytes.Length, out _);
-
-            if (status != NtStatus.Success)
-            {
-                throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
-            }
-
-            Assert.Equal(_testValue, Marshal.ReadInt32(_testAddress));
-        }
+        Assert.Equal(_testValue, Marshal.ReadInt32(_testAddress));
     }
 }

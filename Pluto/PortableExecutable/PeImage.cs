@@ -3,22 +3,21 @@ using System.Collections.Immutable;
 using System.Reflection.PortableExecutable;
 using Pluto.PortableExecutable.DataDirectories;
 
-namespace Pluto.PortableExecutable
+namespace Pluto.PortableExecutable;
+
+internal sealed class PeImage
 {
-    internal sealed class PeImage
+    internal ExportDirectory ExportDirectory { get; }
+
+    internal PeImage(Memory<byte> imageBytes)
     {
-        internal ExportDirectory ExportDirectory { get; }
+        using var peReader = new PEReader(imageBytes.ToArray().ToImmutableArray());
 
-        internal PeImage(Memory<byte> imageBytes)
+        if (peReader.PEHeaders.PEHeader is null || !peReader.PEHeaders.IsDll)
         {
-            using var peReader = new PEReader(imageBytes.ToArray().ToImmutableArray());
-
-            if (peReader.PEHeaders.PEHeader is null || !peReader.PEHeaders.IsDll)
-            {
-                throw new BadImageFormatException("The provided file was not a valid DLL");
-            }
-
-            ExportDirectory = new ExportDirectory(peReader.PEHeaders, imageBytes);
+            throw new BadImageFormatException("The provided file was not a valid DLL");
         }
+
+        ExportDirectory = new ExportDirectory(peReader.PEHeaders, imageBytes);
     }
 }

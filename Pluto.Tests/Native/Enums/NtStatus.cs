@@ -1,7 +1,6 @@
-﻿namespace Pluto.Tests.Native.Enums
+﻿namespace Pluto.Tests.Native.Enums;
+
+internal enum NtStatus
 {
-    internal enum NtStatus
-    {
-        Success = 0x0
-    }
+    Success = 0x0
 }

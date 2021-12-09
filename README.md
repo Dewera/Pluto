@@ -9,7 +9,7 @@ A manual system call library that supports functions from both ntdll.dll and win
 ### Notable features
 
 - Dynamic resolution of syscall indices from disk
-- x86 and x64 support
+- WOW64 and x64 support
 
 ---
 

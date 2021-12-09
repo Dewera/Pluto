@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Reflection.PortableExecutable;
 
-namespace Pluto.PortableExecutable
+namespace Pluto.PortableExecutable;
+
+internal abstract class DataDirectoryBase
 {
-    internal abstract class DataDirectoryBase
+    private protected int DirectoryOffset { get; }
+    private protected Memory<byte> ImageBytes { get; }
+    private protected bool IsValid { get; }
+
+    private readonly PEHeaders _headers;
+
+    private protected DataDirectoryBase(DirectoryEntry directory, PEHeaders headers, Memory<byte> imageBytes)
     {
-        private protected int DirectoryOffset { get; }
-        private protected Memory<byte> ImageBytes { get; }
-        private protected bool IsValid { get; }
+        headers.TryGetDirectoryOffset(directory, out var directoryOffset);
 
-        private readonly PEHeaders _headers;
+        _headers = headers;
 
-        private protected DataDirectoryBase(DirectoryEntry directory, PEHeaders headers, Memory<byte> imageBytes)
-        {
-            headers.TryGetDirectoryOffset(directory, out var directoryOffset);
+        DirectoryOffset = directoryOffset;
+        ImageBytes = imageBytes;
+        IsValid = directoryOffset != -1;
+    }
 
-            _headers = headers;
+    private protected int RvaToOffset(int rva)
+    {
+        var sectionHeader = _headers.SectionHeaders[_headers.GetContainingSectionIndex(rva)];
 
-            DirectoryOffset = directoryOffset;
-            ImageBytes = imageBytes;
-            IsValid = directoryOffset != -1;
-        }
-
-        private protected int RvaToOffset(int rva)
-        {
-            var sectionHeader = _headers.SectionHeaders[_headers.GetContainingSectionIndex(rva)];
-
-            return rva - sectionHeader.VirtualAddress + sectionHeader.PointerToRawData;
-        }
+        return rva - sectionHeader.VirtualAddress + sectionHeader.PointerToRawData;
     }
 }

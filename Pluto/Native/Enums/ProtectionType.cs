@@ -1,7 +1,6 @@
-﻿namespace Pluto.Native.Enums
+﻿namespace Pluto.Native.Enums;
+
+internal enum ProtectionType
 {
-    internal enum ProtectionType
-    {
-        ExecuteReadWrite = 0x40
-    }
+    ExecuteReadWrite = 0x40
 }

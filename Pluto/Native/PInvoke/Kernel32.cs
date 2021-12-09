@@ -2,11 +2,10 @@
 using System.Runtime.InteropServices;
 using Pluto.Native.Enums;
 
-namespace Pluto.Native.PInvoke
+namespace Pluto.Native.PInvoke;
+
+internal static class Kernel32
 {
-    internal static class Kernel32
-    {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern bool VirtualProtect(IntPtr address, nint size, ProtectionType protectionType, out ProtectionType oldProtectionType);
-    }
+    [DllImport("kernel32.dll", SetLastError = true)]
+    internal static extern bool VirtualProtect(IntPtr address, nint size, ProtectionType protectionType, out ProtectionType oldProtectionType);
 }
