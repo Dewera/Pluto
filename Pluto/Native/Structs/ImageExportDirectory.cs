@@ -3,14 +3,4 @@
 namespace Pluto.Native.Structs;
 
 [StructLayout(LayoutKind.Explicit, Size = 40)]
-internal readonly struct ImageExportDirectory
-{
-    [FieldOffset(0x18)]
-    internal readonly int NumberOfNames;
-    [FieldOffset(0x1C)]
-    internal readonly int AddressOfFunctions;
-    [FieldOffset(0x20)]
-    internal readonly int AddressOfNames;
-    [FieldOffset(0x24)]
-    internal readonly int AddressOfNameOrdinals;
-}
+internal readonly record struct ImageExportDirectory([field: FieldOffset(0x18)] int NumberOfNames, [field: FieldOffset(0x1C)] int AddressOfFunctions, [field: FieldOffset(0x20)] int AddressOfNames, [field: FieldOffset(0x24)] int AddressOfNameOrdinals);

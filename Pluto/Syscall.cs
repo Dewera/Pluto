@@ -9,8 +9,6 @@ using Pluto.Shellcode;
 using Pluto.Shellcode.Records;
 using Pluto.Utilities;
 
-[assembly: CLSCompliant(true)]
-
 namespace Pluto;
 
 /// <summary>
