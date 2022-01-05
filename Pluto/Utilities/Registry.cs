@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Pluto.Utilities;
+﻿namespace Pluto.Utilities;
 
 internal static class Registry
 {

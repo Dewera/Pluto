@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Win32.SafeHandles;
+﻿using Microsoft.Win32.SafeHandles;
 using Pluto.Tests.Native.Enums;
 
 namespace Pluto.Tests;

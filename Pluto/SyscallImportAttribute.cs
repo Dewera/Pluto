@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Pluto;
+﻿namespace Pluto;
 
 /// <summary>
 /// Indicates that the attributed delegate represents a syscall signature

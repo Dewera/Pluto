@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Pluto.Native;
@@ -66,8 +64,8 @@ public sealed class Syscall<T> where T : Delegate
 
         // Assemble the shellcode used to perform the syscall
 
-        var syscallDescriptor = new SyscallDescriptor(syscallIndex);
-        var shellcodeBytes = Environment.Is64BitProcess ? Assembler.AssembleSyscall64(syscallDescriptor) : Assembler.AssembleSyscall32(syscallDescriptor);
+        var descriptor = new SyscallDescriptor(syscallIndex);
+        var shellcodeBytes = Environment.Is64BitProcess ? Assembler.AssembleSyscall64(descriptor) : Assembler.AssembleSyscall32(descriptor);
 
         // Write the shellcode into the pinned object heap
 
