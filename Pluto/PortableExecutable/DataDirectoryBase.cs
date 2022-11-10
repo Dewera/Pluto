@@ -4,13 +4,13 @@ namespace Pluto.PortableExecutable;
 
 internal abstract class DataDirectoryBase
 {
-    private protected int DirectoryOffset { get; }
-    private protected Memory<byte> ImageBytes { get; }
-    private protected bool IsValid { get; }
+    protected private int DirectoryOffset { get; }
+    protected private Memory<byte> ImageBytes { get; }
+    protected private bool IsValid { get; }
 
     private readonly PEHeaders _headers;
 
-    private protected DataDirectoryBase(DirectoryEntry directory, PEHeaders headers, Memory<byte> imageBytes)
+    protected private DataDirectoryBase(DirectoryEntry directory, PEHeaders headers, Memory<byte> imageBytes)
     {
         headers.TryGetDirectoryOffset(directory, out var directoryOffset);
 
@@ -21,7 +21,7 @@ internal abstract class DataDirectoryBase
         IsValid = directoryOffset != -1;
     }
 
-    private protected int RvaToOffset(int rva)
+    protected private int RvaToOffset(int rva)
     {
         var sectionHeader = _headers.SectionHeaders[_headers.GetContainingSectionIndex(rva)];
 
