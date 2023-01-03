@@ -1,4 +1,4 @@
-﻿namespace Pluto.Utilities;
+﻿namespace Pluto.Helpers;
 
 internal static class Registry
 {

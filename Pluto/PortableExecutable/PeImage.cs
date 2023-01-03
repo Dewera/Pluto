@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Reflection.PortableExecutable;
+﻿using System.Reflection.PortableExecutable;
 using Pluto.PortableExecutable.DataDirectories;
 
 namespace Pluto.PortableExecutable;
@@ -10,7 +9,7 @@ internal sealed class PeImage
 
     internal PeImage(Memory<byte> imageBytes)
     {
-        using var peReader = new PEReader(imageBytes.ToArray().ToImmutableArray());
+        using var peReader = new PEReader(new MemoryStream(imageBytes.ToArray()));
 
         if (peReader.PEHeaders.PEHeader is null || !peReader.PEHeaders.IsDll)
         {

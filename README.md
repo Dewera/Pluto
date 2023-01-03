@@ -1,7 +1,5 @@
 ## Pluto
 
-![](https://github.com/Dewera/Pluto/workflows/Continuous%20Integration/badge.svg)
-
 A manual system call library that supports functions from both ntdll.dll and win32u.dll
 
 ---
@@ -19,9 +17,9 @@ The example below demonstrates a basic implementation of the library
 
 ```c#
 [SyscallImport("ntdll.dll")]
-public delegate NtStatus NtClose(IntPtr handle);
+public delegate NtStatus NtClose(nint handle);
 
-var handle = IntPtr.Zero;
+var handle = -1;
 
 var syscall = new Syscall<NtClose>();
 var status = syscall.Method(handle); 

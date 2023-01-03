@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Pluto.Tests.Native.Enums;
+using Pluto.Tests.Extensions;
 using Pluto.Tests.Native.PInvoke;
 using Xunit;
 
@@ -11,7 +11,7 @@ namespace Pluto.Tests;
 public sealed class SyscallTests : IDisposable
 {
     private readonly Process _process;
-    private readonly IntPtr _testAddress;
+    private readonly nint _testAddress;
     private readonly int _testValue;
 
     public SyscallTests()
@@ -36,7 +36,7 @@ public sealed class SyscallTests : IDisposable
         var syscall = new Syscall<Signatures.NtReadVirtualMemory>();
         var status = syscall.Method(_process.SafeHandle, _testAddress, out bytes[0], bytes.Length, out _);
 
-        if (status != NtStatus.Success)
+        if (!status.IsSuccess())
         {
             throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
         }
@@ -53,7 +53,7 @@ public sealed class SyscallTests : IDisposable
         var syscall = new Syscall<Signatures.NtWriteVirtualMemory>();
         var status = syscall.Method(_process.SafeHandle, _testAddress, in bytes[0], bytes.Length, out _);
 
-        if (status != NtStatus.Success)
+        if (!status.IsSuccess())
         {
             throw new Win32Exception(Ntdll.RtlNtStatusToDosError(status));
         }
